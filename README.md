@@ -1,7 +1,7 @@
 # CSE232_Project
 
-## Grup Üyeleri:
-| Name  | School Number |
+## Group Members:
+| Name  | Student ID |
 | ------------- | ------------- |
 | Ertuğrul ÇEVİK  | ***  |
 | Emre AYIK  | ***  |
