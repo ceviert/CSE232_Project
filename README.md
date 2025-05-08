@@ -11,6 +11,32 @@
   | your id | your username | your real name |
   | your id | your username | your real name |
 
+# HOW TO USE THIS REPO:
+## Firstly:
+Download the library and install it using  
+```bash
+sudo apt-get install libncurses-dev 
+```
+
+## Clean:
+```bash
+make clean
+```
+
+## Build:
+```bash
+make build
+```
+
+## Run:
+```bash
+make run
+```
+
+## AND:
+```bash
+make clean && make build && make run
+```
 
 # HOW TO (new to github)
 ## Clone
