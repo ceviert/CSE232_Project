@@ -1,3 +1,6 @@
 # build locations:
 bin
 obj
+
+#vscode config
+.vscode

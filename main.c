@@ -65,7 +65,7 @@ int getStringNcurses(char *tostr, int maxChar) {
  * 2. A set of available commands (Edit, Insert, Delete, Undo, Redo, etc.)
  * 3. The current file name.
  */
-void DisplayMetod(void) {
+void DisplayMethod(void) {
     clear();  // Clear the screen
     move(0, 0);  // Move the cursor to the top-left corner
     printw(PROJECT_TITLE);  // Print the project title
@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
     keypad(stdscr, TRUE);  // Enable special keys (e.g., arrow keys)
     curs_set(1);  // Set the cursor to normal visibility
 
-    DisplayMetod();  // Display the initial screen with instructions
+    DisplayMethod();  // Display the initial screen with instructions
 
     int ch;
     while ((ch = getch()) != 'Q') {  // Main loop, break when 'Q' is pressed
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
                 char statement[TEXT_BUFFER_STATEMENT_LENGTH];
                 getStringNcurses(statement, TEXT_BUFFER_STATEMENT_LENGTH);  // Get the text to insert
 
-                // insert(cursorY, statement);  // Uncomment to insert the statement
+                insert(cursorY, statement);  // Uncomment to insert the statement
                 break;
 
             case 'D':  // Delete line
@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
                 
                 getStringNcurses(file_name, MAX_FILE_NAME_LENGTH);  // Get file name to save
 
-                // save(file_name);  // Uncomment to save the file
+                save(file_name);  // Uncomment to save the file
                 break;
 
             case 'H':  // Display help
@@ -199,7 +199,7 @@ int main(int argc, char *argv[]) {
             case 'R':
             case 'S':
             case 'H':
-                DisplayMetod();  // Display the updated screen after each action
+                DisplayMethod();  // Display the updated screen after each action
                 break;
         }
 
