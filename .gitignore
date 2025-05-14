@@ -2,5 +2,8 @@
 bin
 obj
 
+TEST.txt
+
 #vscode config
+.git
 .vscode

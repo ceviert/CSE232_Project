@@ -10,6 +10,8 @@ LIBRARY      := bin/$(LIBRARY_NAME)
 
 MAINFILE	:= main
 
+TESTFILE 	:= TEST.txt
+
 INC_DIR     := inc
 SRC_DIR     := src
 OBJ_DIR     := obj
@@ -18,6 +20,10 @@ BIN_DIR     := bin
 AR          := ar
 CC          := gcc
 CFLAGS      := -O2 -I$(INC_DIR)
+
+ifeq ($(DEBUG),1)
+    CFLAGS += -DDEBUG
+endif
 
 LDFLAGS      := -lncurses
 
@@ -46,8 +52,11 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 directories:
 	@mkdir -p $(OBJ_DIR) $(BIN_DIR)
 
-run: $(TARGET)
-	./$(TARGET)
+$(TESTFILE):
+	touch  $(TESTFILE)
+
+run: $(TARGET) $(TESTFILE)
+	./$(TARGET) $(TESTFILE)
 
 init:
 	@for file in $(FILES); do \

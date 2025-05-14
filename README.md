@@ -24,8 +24,14 @@ make clean
 ```
 
 ## Build:
+Standart build:
 ```bash
 make build
+```
+
+if you want to build with DEBUG interface:
+```bash
+make build DEBUG=1
 ```
 
 ## Run:
