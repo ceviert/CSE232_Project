@@ -2,6 +2,7 @@
 bin
 obj
 
+main.o
 TEST.txt
 
 #vscode config
