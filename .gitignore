@@ -1,0 +1,10 @@
+# build locations:
+bin
+obj
+
+main.o
+TEST.txt
+
+#vscode config
+.git
+.vscode
