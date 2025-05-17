@@ -13,6 +13,12 @@
 #define MAX_FILE_NAME_LENGTH                    256
 #define PROJECT_TITLE                           "CSE-232 EDITOR (press H for help)"
 
+#ifdef DEBUG
+    #define DEBUG_PRINT(...) printf(__VA_ARGS__)
+#else
+    #define DEBUG_PRINT(...)
+#endif
+
 struct node
 {  
     int prev;   // points to the textbuffer[] index of the previous statement   

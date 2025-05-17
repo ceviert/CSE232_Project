@@ -26,12 +26,12 @@ make clean
 ## Build:
 Standart build:
 ```bash
-make build
+make all
 ```
 
 if you want to build with DEBUG interface:
 ```bash
-make build DEBUG=1
+make all DEBUG=1
 ```
 
 ## Run:
@@ -41,7 +41,7 @@ make run
 
 ## AND:
 ```bash
-make clean && make build && make run
+make clean && make all && make run
 ```
 
 # HOW TO (new to github)

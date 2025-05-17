@@ -40,14 +40,14 @@ int get_argument(char *com, int n, char type, void *ptr, int limit) {
 
 void dump_chain(int head, const char *label) {
     printf("\n--- %s Chain Dump ---\n", label);
-    printf("%-5s %-5s %-5s %-40s\n", "Idx", "Prev", "Next", "Statement");
+    printf("%-5s %-5s %-5s %s\n", "Idx", "Prev", "Next", "Statement");
     printf("---------------------------------------------------------------\n");
 
     int current = head;
 
     while (current != NULL_LINE_TERMINATOR) {
         struct node *n = &textbuffer[current];
-        printf("%-5d %-5d %-5d %-40s\n", current, n->prev, n->next, n->statement);
+        printf("%-5d %-5d %-5d %s\n", current, n->prev, n->next, n->statement);
         current = n->next;
     }
 }
@@ -59,9 +59,6 @@ void dump_list(const char *label) {
 
     for (int i=0; i<TEXT_BUFFER_DEPTH ; i++) {
         struct node *n = &textbuffer[i];
-        if (strlen(n->statement))
-            printf("%-5d |%-5d |%-5d |%-40s\r", i, n->prev, n->next, n->statement);
-        else
-            printf("%-5d |%-5d |%-5d |\n", i, n->prev, n->next);
+        printf("%-5d |%-5d |%-5d |%s\n", i, n->prev, n->next, n->statement);
     }
 }

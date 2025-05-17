@@ -3,12 +3,6 @@
 #include <string.h> 
 #include "cse232editor.h"
 
-#ifdef DEBUG
-    #define DEBUG_PRINT(...) printf(__VA_ARGS__)
-#else
-    #define DEBUG_PRINT(...)
-#endif
-
 typedef struct stateNode {
     char operation; // 'i' for insertion or 'd' for deletion operation
     int prev_free_head; // free_head before the operation

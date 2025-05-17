@@ -22,7 +22,7 @@ void save(char *filename) {
 
     // Loop through the text buffer starting from the line pointed by `inuse_head`
     for (int iter = inuse_head; iter != NULL_LINE_TERMINATOR; iter = textbuffer[iter].next) {
-        fprintf(fp, "%s", textbuffer[iter].statement);  // Write each line (statement) to the file
+        fprintf(fp, "%s\n", textbuffer[iter].statement);  // Write each line (statement) to the file
     }
 
     fclose(fp);  // Close the file after writing

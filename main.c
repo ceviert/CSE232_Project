@@ -7,6 +7,7 @@
 #include <curses.h> // For ncurses-based TUI
 
 #include "cse232editor.h" // Contains declarations and macros used in the project
+#include "debug_interface.h" // Contains declarations and macros used in the project
 
 // ----------------------------------------------------------------------------
 // GLOBAL VARIABLES
@@ -82,7 +83,7 @@ void display2(void)
 {
     for (int iter = inuse_head; iter != NULL_LINE_TERMINATOR; iter = textbuffer[iter].next)
     {
-        printf("%s", textbuffer[iter].statement);
+        printf("%s\n", textbuffer[iter].statement);
     }
 }
 
@@ -123,6 +124,8 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    edit(file_name);
+
 #ifndef DEBUG // ------------ INTERACTIVE NCURSES MODE ------------
     initscr();            // Initialize screen for ncurses
     cbreak();             // Disable line buffering
@@ -155,7 +158,7 @@ int main(int argc, char *argv[])
             }
 
             case 'D':
-                // delete(cursorY); // Delete line at cursorY
+                delete(cursorY); // Delete line at cursorY
                 break;
 
             case 'U':
@@ -208,6 +211,7 @@ int main(int argc, char *argv[])
             char statement[TEXT_BUFFER_STATEMENT_LENGTH];
             get_argument(command, 1, 'd', &line, 0);
             get_argument(command, 2, 's', statement, TEXT_BUFFER_STATEMENT_LENGTH);
+            statement[strcspn(statement, "\n")] = '\0';
             printf("text inserted: (line: %d, statement: %s)\n", line, statement);
             insert(line, statement);
         }
@@ -215,7 +219,7 @@ int main(int argc, char *argv[])
         {
             int line;
             get_argument(command, 1, 'd', &line, 0);
-            // delete(line);
+            delete(line);
         }
         else if (!strncmp(command, "undo", 4))
         {
@@ -230,7 +234,7 @@ int main(int argc, char *argv[])
             save(file_name);
             printf("File saved, file name: %s\n", file_name);
         }
-        else if (!strncmp(command, "display", 8))
+        else if (!strncmp(command, "display", 7))
         {
             display2();
         }

@@ -54,6 +54,9 @@ directories:
 
 $(TESTFILE):
 	touch  $(TESTFILE)
+	echo "!Test File" >> $(TESTFILE)
+	echo "deaddead" >> $(TESTFILE)
+	echo "beafbeaf" >> $(TESTFILE)
 
 run: $(TARGET) $(TESTFILE)
 	./$(TARGET) $(TESTFILE)
