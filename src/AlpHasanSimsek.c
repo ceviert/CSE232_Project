@@ -3,6 +3,12 @@
 #include <string.h> 
 #include "cse232editor.h"
 
+#ifdef DEBUG
+    #define DEBUG_PRINT(...) printf(__VA_ARGS__)
+#else
+    #define DEBUG_PRINT(...)
+#endif
+
 typedef struct stateNode {
     char operation; // 'i' for insertion or 'd' for deletion operation
     int prev_free_head; // free_head before the operation
@@ -15,7 +21,7 @@ typedef struct stateNode {
 struct stateNode* undoTop = NULL;
 struct stateNode* redoTop = NULL;
 
-void pushUndo(struct stateNode theNode) { // gets called before an insertion, deletion or redo operation being performed
+void pushUndo(struct stateNode theNode) {
     stateNode* newNode = (stateNode*) malloc(sizeof(struct stateNode));
 
     if (newNode == NULL) { 
@@ -25,16 +31,16 @@ void pushUndo(struct stateNode theNode) { // gets called before an insertion, de
 
     *newNode = theNode;
 
-    if(undoTop == NULL){
+    if (undoTop == NULL) {
         undoTop = newNode;
         undoTop->next = NULL;
-    }else{
+    } else {
         newNode->next = undoTop; 
         undoTop = newNode;       
     }
 }
 
-stateNode popUndo(){ // gets called when an operation is being undo { by undo() }
+stateNode popUndo() {
     if (undoTop == NULL) {
         stateNode empty = {'\0', 0, 0, "", 0, NULL};
         return empty;
@@ -48,7 +54,7 @@ stateNode popUndo(){ // gets called when an operation is being undo { by undo() 
     return recoveryNode;
 }
 
-void pushRedo(struct stateNode theNode) { // get called after undo() 
+void pushRedo(struct stateNode theNode) {
     stateNode* newNode = (stateNode*) malloc(sizeof(struct stateNode));
 
     if (newNode == NULL) { 
@@ -58,16 +64,16 @@ void pushRedo(struct stateNode theNode) { // get called after undo()
 
     *newNode = theNode;
 
-    if(redoTop == NULL){
+    if (redoTop == NULL) {
         redoTop = newNode;
         redoTop->next = NULL;
-    }else{
+    } else {
         newNode->next = redoTop; 
         redoTop = newNode;      
     }
 }
 
-stateNode popRedo(){ // Gets called when an operation is being redo { by redo() }
+stateNode popRedo() {
     if (redoTop == NULL) {
         stateNode empty = {'\0', 0, 0, "", 0, NULL};
         return empty;
@@ -81,11 +87,11 @@ stateNode popRedo(){ // Gets called when an operation is being redo { by redo() 
     return recoveryNode;
 }
 
-void clearRedo(){ // The redo stack will be reset if a new operation is added to the undo stack
+void clearRedo() {
     redoTop = NULL;
 }
 
-void updateUndoStack(char op, char statement[], int line_num){ 
+void updateUndoStack(char op, char statement[], int line_num) {
     stateNode newnode;
     newnode.operation = op;
     newnode.prev_free_head = free_head;
@@ -96,60 +102,60 @@ void updateUndoStack(char op, char statement[], int line_num){
     clearRedo();
 }
 
-void undo(){
-    if(undoTop == NULL){
-        printf("Nothing to undo\n"); 
+void undo() {
+    if (undoTop == NULL) {
+        DEBUG_PRINT("Nothing to undo\n"); 
         return;
     }
     
     stateNode tmp = popUndo();
     
-    if(tmp.operation == 'd'){
-        printf("Undoing a delete operation, inserting '%s' at line '%d'.\n", tmp.recoveryStatement, tmp.line_num);
+    if (tmp.operation == 'd') {
+        DEBUG_PRINT("Undoing a delete operation, inserting '%s' at line '%d'.\n", tmp.recoveryStatement, tmp.line_num);
         stateNode redoNode = {'d', free_head, inuse_head, "", tmp.line_num, NULL};
         strcpy(redoNode.recoveryStatement, tmp.recoveryStatement);
         pushRedo(redoNode);
         free_head = tmp.prev_free_head;
         inuse_head = tmp.prev_inuse_head;
-        printf("inuse_head: '%d', free_head: '%d' now.\n",inuse_head,free_head);
-        //insert(tmp.line_num, tmp.recoveryStatement, true);
-    }else{
-        printf("Undoing a insert operation, deleting line '%d'\n", tmp.line_num);
+        DEBUG_PRINT("inuse_head: '%d', free_head: '%d' now.\n", inuse_head, free_head);
+        insert(tmp.line_num, tmp.recoveryStatement, true);
+    } else {
+        DEBUG_PRINT("Undoing an insert operation, deleting line '%d'\n", tmp.line_num);
         stateNode redoNode = {'i', free_head, inuse_head, "", tmp.line_num, NULL};
         strcpy(redoNode.recoveryStatement, tmp.recoveryStatement);
         pushRedo(redoNode);
         free_head = tmp.prev_free_head;
         inuse_head = tmp.prev_inuse_head;
-        printf("inuse_head: '%d', free_head: '%d' now.\n",inuse_head,free_head);
-        //delete(tmp.line_num, true);
+        DEBUG_PRINT("inuse_head: '%d', free_head: '%d' now.\n", inuse_head, free_head);
+        delete(tmp.line_num, true);
     }
 }
 
-void redo(){
-    if(redoTop == NULL){
-        printf("Nothing to redo\n"); 
+void redo() {
+    if (redoTop == NULL) {
+        DEBUG_PRINT("Nothing to redo\n"); 
         return;
     }
     
     stateNode tmp = popRedo();
     
-    if(tmp.operation == 'd'){
-        printf("Redoing a delete operation, deleting line '%d'.\n", tmp.line_num);
+    if (tmp.operation == 'd') {
+        DEBUG_PRINT("Redoing a delete operation, deleting line '%d'.\n", tmp.line_num);
         stateNode undoNode = {'d', free_head, inuse_head, "", tmp.line_num, NULL};
         strcpy(undoNode.recoveryStatement, tmp.recoveryStatement);
         pushUndo(undoNode);
         free_head = tmp.prev_free_head;
         inuse_head = tmp.prev_inuse_head;
-        printf("inuse_head: '%d', free_head: '%d' now.\n",inuse_head,free_head);
+        DEBUG_PRINT("inuse_head: '%d', free_head: '%d' now.\n", inuse_head, free_head);
         delete(tmp.line_num, true);
-    }else{
-        printf("Redoing a insert operation, inserting '%s' at line '%d'\n", tmp.recoveryStatement, tmp.line_num);
+    } else {
+        DEBUG_PRINT("Redoing an insert operation, inserting '%s' at line '%d'\n", tmp.recoveryStatement, tmp.line_num);
         stateNode undoNode = {'i', free_head, inuse_head, "", tmp.line_num, NULL};
         strcpy(undoNode.recoveryStatement, tmp.recoveryStatement);
         pushUndo(undoNode);
         free_head = tmp.prev_free_head;
         inuse_head = tmp.prev_inuse_head;
-        printf("inuse_head: '%d', free_head: '%d' now.\n",inuse_head,free_head);
+        DEBUG_PRINT("inuse_head: '%d', free_head: '%d' now.\n", inuse_head, free_head);
         insert(tmp.line_num, tmp.recoveryStatement, true);
     }
 }
