@@ -20,6 +20,11 @@ void insert(int line, char* stat) {
     int new_node = free_head; // Allocate a new node
     free_head = textbuffer[free_head].next; // Remove the new node from the `text_buffer[]` by advancing the `free_head`
 
+    // Reset the prev of new free_head if it's not NULL_LINE_TERMINATOR
+    if (free_head != NULL_LINE_TERMINATOR) {
+        textbuffer[free_head].prev = NULL_LINE_TERMINATOR;
+    }
+
     strncpy(textbuffer[new_node].statement, stat, TEXT_BUFFER_STATEMENT_LENGTH - 1); // Copy `stat` to `textbuffer[new_node].statement` up to `TEXT_BUFFER_STATEMENT_LENGTH - 1` characters
     textbuffer[new_node].statement[TEXT_BUFFER_STATEMENT_LENGTH - 1] = '\0'; // Ensure that the statement ends with the null char
 
