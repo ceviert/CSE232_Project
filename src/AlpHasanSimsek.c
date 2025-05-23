@@ -3,17 +3,25 @@
 #include <string.h> 
 #include "cse232editor.h"
 
-typedef struct stateNode {
-    char operation; // 'i' for insertion or 'd' for deletion operation
-    int prev_free_head; // free_head before the operation
-    int prev_inuse_head; // inuse_head before the operation
-    char recoveryStatement[TEXT_BUFFER_STATEMENT_LENGTH];
-    int line_num;
-    struct stateNode* next;
-} stateNode;
-
 struct stateNode* undoTop = NULL;
 struct stateNode* redoTop = NULL;
+
+void reserveTheState(int operation_line, char operation_type){
+    char *statement = textbuffer[operation_line].statement;        
+    updateUndoStack(operation_type, statement, operation_line, free_head, inuse_head); 
+}
+
+void updateUndoStack(char op, char statement[], int line_num, int old_free_head, int old_inuse_head) {
+    
+    stateNode newnode;
+    newnode.operation = op;
+    newnode.prev_free_head = old_free_head;
+    newnode.prev_inuse_head = old_inuse_head;
+    newnode.line_num = line_num;
+    strcpy(newnode.recoveryStatement, statement); 
+    pushUndo(newnode);
+    clearRedo();
+}
 
 void pushUndo(struct stateNode theNode) {
     stateNode* newNode = (stateNode*) malloc(sizeof(struct stateNode));
@@ -85,18 +93,7 @@ void clearRedo() {
     redoTop = NULL;
 }
 
-void updateUndoStack(char op, char statement[], int line_num) {
-    stateNode newnode;
-    newnode.operation = op;
-    newnode.prev_free_head = free_head;
-    newnode.prev_inuse_head = inuse_head;
-    newnode.line_num = line_num;
-    strcpy(newnode.recoveryStatement, statement); 
-    pushUndo(newnode);
-    clearRedo();
-}
-
-void undo() {
+void undo(void) {
     if (undoTop == NULL) {
         DEBUG_PRINT("Nothing to undo\n"); 
         return;
@@ -107,12 +104,12 @@ void undo() {
     if (tmp.operation == 'd') {
         DEBUG_PRINT("Undoing a delete operation, inserting '%s' at line '%d'.\n", tmp.recoveryStatement, tmp.line_num);
         stateNode redoNode = {'d', free_head, inuse_head, "", tmp.line_num, NULL};
-        strcpy(redoNode.recoveryStatement, tmp.recoveryStatement);
+        //strcpy(redoNode.recoveryStatement, tmp.recoveryStatement); no need for the statment when redoing a delete operation
         pushRedo(redoNode);
         free_head = tmp.prev_free_head;
         inuse_head = tmp.prev_inuse_head;
         DEBUG_PRINT("inuse_head: '%d', free_head: '%d' now.\n", inuse_head, free_head);
-        insert(tmp.line_num, tmp.recoveryStatement, true);
+        insert(tmp.line_num, tmp.recoveryStatement);
     } else {
         DEBUG_PRINT("Undoing an insert operation, deleting line '%d'\n", tmp.line_num);
         stateNode redoNode = {'i', free_head, inuse_head, "", tmp.line_num, NULL};
@@ -121,11 +118,11 @@ void undo() {
         free_head = tmp.prev_free_head;
         inuse_head = tmp.prev_inuse_head;
         DEBUG_PRINT("inuse_head: '%d', free_head: '%d' now.\n", inuse_head, free_head);
-        delete(tmp.line_num, true);
+        delete(tmp.line_num);
     }
 }
 
-void redo() {
+void redo(void) {
     if (redoTop == NULL) {
         DEBUG_PRINT("Nothing to redo\n"); 
         return;
@@ -141,15 +138,15 @@ void redo() {
         free_head = tmp.prev_free_head;
         inuse_head = tmp.prev_inuse_head;
         DEBUG_PRINT("inuse_head: '%d', free_head: '%d' now.\n", inuse_head, free_head);
-        delete(tmp.line_num, true);
+        delete(tmp.line_num);
     } else {
         DEBUG_PRINT("Redoing an insert operation, inserting '%s' at line '%d'\n", tmp.recoveryStatement, tmp.line_num);
         stateNode undoNode = {'i', free_head, inuse_head, "", tmp.line_num, NULL};
-        strcpy(undoNode.recoveryStatement, tmp.recoveryStatement);
+        //strcpy(undoNode.recoveryStatement, tmp.recoveryStatement); no need for a statement when undoing an insert operation
         pushUndo(undoNode);
         free_head = tmp.prev_free_head;
         inuse_head = tmp.prev_inuse_head;
         DEBUG_PRINT("inuse_head: '%d', free_head: '%d' now.\n", inuse_head, free_head);
-        insert(tmp.line_num, tmp.recoveryStatement, true);
+        insert(tmp.line_num, tmp.recoveryStatement);
     }
 }

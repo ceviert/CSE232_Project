@@ -153,20 +153,33 @@ int main(int argc, char *argv[])
             case 'I': {
                 char statement[TEXT_BUFFER_STATEMENT_LENGTH];
                 getStringNcurses(statement, TEXT_BUFFER_STATEMENT_LENGTH);
-                insert(cursorY, statement); // Insert line at cursorY
+
+                reserveTheState(cursorY, 'i');
+
+                if(!insert(cursorY, statement)){
+                    popUndo();
+                }
+
                 break;
             }
 
-            case 'D':
-                delete(cursorY); // Delete line at cursorY
+            case 'D': {
+
+                reserveTheState(cursorY, 'd');
+
+                if(!delete(cursorY)){
+                    popUndo();
+                }
+
                 break;
+            }
 
             case 'U':
-                // undo(); // Undo last operation
+                undo(); // Undo last operation
                 break;
 
             case 'R':
-                // redo(); // Redo last undone operation
+                redo(); // Redo last undone operation
                 break;
 
             case 'S':
