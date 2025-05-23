@@ -154,10 +154,8 @@ int main(int argc, char *argv[])
                 char statement[TEXT_BUFFER_STATEMENT_LENGTH];
                 getStringNcurses(statement, TEXT_BUFFER_STATEMENT_LENGTH);
 
-                reserveTheState(cursorY, 'i');
-
-                if(insert(cursorY, statement) == -1){
-                    cancel_recovery();
+                if(insert(cursorY, statement) != -1){
+                    reserveTheState(cursorY, 'i');
                 }
 
                 break;
@@ -165,10 +163,8 @@ int main(int argc, char *argv[])
 
             case 'D': {
 
-                reserveTheState(cursorY, 'd');
-
-                if(delete(cursorY) == -1){
-                    cancel_recovery();
+                if(delete(cursorY) != -1){
+                    reserveTheState(cursorY, 'd');
                 }
 
                 break;
@@ -226,11 +222,9 @@ int main(int argc, char *argv[])
             get_argument(command, 2, 's', statement, TEXT_BUFFER_STATEMENT_LENGTH);
             statement[strcspn(statement, "\n")] = '\0';
             printf("text inserted: (line: %d, statement: %s)\n", line, statement);
-            
-            reserveTheState(line, 'i');
 
-            if(insert(line, statement) == -1){
-                cancel_recovery();
+            if(insert(line, statement) != -1){
+                reserveTheState(line, 'i');
             }
         }
         else if (!strncmp(command, "insert", 6))
@@ -247,11 +241,9 @@ int main(int argc, char *argv[])
         {
             int line;
             get_argument(command, 1, 'd', &line, 0);
-            
-            reserveTheState(line, 'd');
 
-            if(delete(line) == -1){
-                cancel_recovery();
+            if(delete(line) != -1){
+                reserveTheState(line, 'd');
             }
         }
         else if (!strncmp(command, "delete", 6))

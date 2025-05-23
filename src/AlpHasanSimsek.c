@@ -6,12 +6,16 @@
 struct stateNode* undoTop = NULL;
 struct stateNode* redoTop = NULL;
 
-void reserveTheState(int operation_line, char operation_type){
-    char *statement = textbuffer[operation_line].statement;
-    updateUndoStack(operation_type, statement, operation_line);
-
-    DEBUG_PRINT("reserveTheState:: line: %d, type: %c\n", operation_line, operation_type);
-}
+void reserveTheState(int operation_line, char operation_type);
+void updateUndoStack(char op, char statement[], int line_num);
+void pushUndo(struct stateNode theNode);
+stateNode popUndo();
+void pushRedo(struct stateNode theNode);
+stateNode popRedo();
+void clearRedo();
+void undo(void);
+void redo(void);
+void cancel_recovery( void );
 
 void updateUndoStack(char op, char statement[], int line_num) {
     
@@ -21,6 +25,22 @@ void updateUndoStack(char op, char statement[], int line_num) {
     strcpy(newnode.recoveryStatement, statement); 
     pushUndo(newnode);
     clearRedo();
+}
+
+void reserveTheState(int operation_line, char operation_type){
+    //int indis = NULL_LINE_TERMINATOR;
+    //int counter = operation_line-1;
+    //for (indis = inuse_head; (indis != NULL_LINE_TERMINATOR && (counter != 0)); indis = textbuffer[indis].next, counter--);
+
+    if(operation_line < free_head-1){
+        operation_line = textbuffer[operation_line].next;
+    }
+
+    char *statement = textbuffer[operation_line].statement;
+
+    updateUndoStack(operation_type, statement, operation_line);
+
+    DEBUG_PRINT("reserveTheState:: line: %d, type: %c, saved statement: %s\n", operation_line, operation_type, statement);
 }
 
 void pushUndo(struct stateNode theNode) {
@@ -42,9 +62,13 @@ void pushUndo(struct stateNode theNode) {
     }
 }
 
-stateNode popUndo() {
+stateNode popUndo(void) {
     if (undoTop == NULL) {
-        stateNode empty = {'\0', 0, 0, "", 0, NULL};
+        stateNode empty;
+        empty.line_num = 0;
+        empty.next = 0;
+        empty.operation = '?';
+        empty.recoveryStatement[0] = '\0';
         return empty;
     }
 
@@ -75,9 +99,13 @@ void pushRedo(struct stateNode theNode) {
     }
 }
 
-stateNode popRedo() {
+stateNode popRedo(void) {
     if (redoTop == NULL) {
-        stateNode empty = {'\0', 0, 0, "", 0, NULL};
+        stateNode empty;
+        empty.line_num = 0;
+        empty.next = 0;
+        empty.operation = '?';
+        empty.recoveryStatement[0] = '\0';
         return empty;
     }
 
@@ -89,7 +117,7 @@ stateNode popRedo() {
     return recoveryNode;
 }
 
-void clearRedo() {
+void clearRedo(void) {
     redoTop = NULL;
 }
 
@@ -99,19 +127,29 @@ void undo(void) {
         return;
     }
     
+    DEBUG_PRINT("Doing undo operation\n"); 
     stateNode tmp = popUndo();
     
     if (tmp.operation == 'd') {
         DEBUG_PRINT("Undoing a delete operation, inserting '%s' at line '%d'.\n", tmp.recoveryStatement, tmp.line_num);
-        stateNode redoNode = {'d', "", tmp.line_num, NULL};
+        stateNode redoNode;
+        redoNode.line_num = tmp.line_num;
+        redoNode.next = NULL;
+        redoNode.operation = 'd';
+        strcpy(redoNode.recoveryStatement, tmp.recoveryStatement);
         pushRedo(redoNode);
         insert(tmp.line_num, tmp.recoveryStatement);
+        DEBUG_PRINT("recoveryStatment: %s, what it should be: %s\n",redoNode.recoveryStatement, tmp.recoveryStatement); 
     } else {
         DEBUG_PRINT("Undoing an insert operation, deleting line '%d'\n", tmp.line_num);
-        stateNode redoNode = {'i', "", tmp.line_num, NULL};
+        stateNode redoNode;
+        redoNode.line_num = tmp.line_num;
+        redoNode.next = NULL;
+        redoNode.operation = 'i';
         strcpy(redoNode.recoveryStatement, tmp.recoveryStatement);
         pushRedo(redoNode);
         delete(tmp.line_num);
+        DEBUG_PRINT("recoveryStatment: %s, what it should be: %s\n",redoNode.recoveryStatement, tmp.recoveryStatement); 
     }
 }
 
@@ -121,20 +159,29 @@ void redo(void) {
         return;
     }
     
+    DEBUG_PRINT("Doing redo operation\n"); 
     stateNode tmp = popRedo();
     
     if (tmp.operation == 'd') {
         DEBUG_PRINT("Redoing a delete operation, deleting line '%d'.\n", tmp.line_num);
-        stateNode undoNode = {'d', "", tmp.line_num, NULL};
+        stateNode undoNode;
+        undoNode.line_num = tmp.line_num;
+        undoNode.next = NULL;
+        undoNode.operation = 'd';
         strcpy(undoNode.recoveryStatement, tmp.recoveryStatement);
         pushUndo(undoNode);
         delete(tmp.line_num);
+        DEBUG_PRINT("recoveryStatment: %s, what it should be: %s\n",undoNode.recoveryStatement, tmp.recoveryStatement); 
     } else {
         DEBUG_PRINT("Redoing an insert operation, inserting '%s' at line '%d'\n", tmp.recoveryStatement, tmp.line_num);
-        stateNode undoNode = {'i', "", tmp.line_num, NULL};
-        //strcpy(undoNode.recoveryStatement, tmp.recoveryStatement); no need for a statement when undoing an insert operation
+        stateNode undoNode;
+        undoNode.line_num = tmp.line_num;
+        undoNode.next = NULL;
+        undoNode.operation = 'i';
+        strcpy(undoNode.recoveryStatement, tmp.recoveryStatement);
         pushUndo(undoNode);
         insert(tmp.line_num, tmp.recoveryStatement);
+        DEBUG_PRINT("recoveryStatment: %s, what it should be: %s\n",undoNode.recoveryStatement, tmp.recoveryStatement); 
     }
 }
 
