@@ -29,8 +29,6 @@ struct node
 // Required things for redo and undo
 typedef struct stateNode {
     char operation; // 'i' for insertion or 'd' for deletion operation
-    int prev_free_head; // free_head before the operation
-    int prev_inuse_head; // inuse_head before the operation
     char recoveryStatement[TEXT_BUFFER_STATEMENT_LENGTH];
     int line_num;
     struct stateNode* next;
