@@ -33,7 +33,7 @@ void delete(int line){
     }
     
     int current_head = inuse_head;
-    int count = 1;
+    int count = 0;
 
     while (current_head != NULL_LINE_TERMINATOR && count < line) { // a loop for to reach to be deleted line
         current_head = textbuffer[current_head].next;
