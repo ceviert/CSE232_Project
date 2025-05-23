@@ -36,11 +36,7 @@ typedef struct stateNode {
     struct stateNode* next;
 } stateNode;
 
-extern int SAVED_free_head;
-extern int SAVED_inuse_head;
-void pushUndo(struct stateNode theNode);
-void clearRedo(void);
-void updateUndoStack(char op, char statement[], int line_num, int old_free_head, int old_inuse_head);
+void cancel_recovery( void );
 void reserveTheState(int operation_line, char operation_type);
 //--------------------------------------------------------------------------
 
@@ -53,8 +49,8 @@ extern char file_name [MAX_FILE_NAME_LENGTH];
 
 // Functions
 void edit(char *filename);
-void insert(int line, char *stat);
-void delete(int line);
+int insert(int line, char *stat);
+int delete(int line);
 void undo( void );
 void redo( void ); 
 void display( void );

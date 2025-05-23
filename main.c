@@ -156,8 +156,8 @@ int main(int argc, char *argv[])
 
                 reserveTheState(cursorY, 'i');
 
-                if(!insert(cursorY, statement)){
-                    popUndo();
+                if(insert(cursorY, statement) == -1){
+                    cancel_recovery();
                 }
 
                 break;
@@ -167,8 +167,8 @@ int main(int argc, char *argv[])
 
                 reserveTheState(cursorY, 'd');
 
-                if(!delete(cursorY)){
-                    popUndo();
+                if(delete(cursorY) == -1){
+                    cancel_recovery();
                 }
 
                 break;
@@ -218,7 +218,22 @@ int main(int argc, char *argv[])
             get_argument(command, 1, 's', file_name, MAX_FILE_NAME_LENGTH);
             edit(file_name);
         }
-        else if (!strncmp(command, "insert", 5))
+        else if (!strncmp(command, "insert2", 7))
+        {
+            int line;
+            char statement[TEXT_BUFFER_STATEMENT_LENGTH];
+            get_argument(command, 1, 'd', &line, 0);
+            get_argument(command, 2, 's', statement, TEXT_BUFFER_STATEMENT_LENGTH);
+            statement[strcspn(statement, "\n")] = '\0';
+            printf("text inserted: (line: %d, statement: %s)\n", line, statement);
+            
+            reserveTheState(line, 'i');
+
+            if(insert(line, statement) == -1){
+                cancel_recovery();
+            }
+        }
+        else if (!strncmp(command, "insert", 6))
         {
             int line;
             char statement[TEXT_BUFFER_STATEMENT_LENGTH];
@@ -228,6 +243,17 @@ int main(int argc, char *argv[])
             printf("text inserted: (line: %d, statement: %s)\n", line, statement);
             insert(line, statement);
         }
+        else if (!strncmp(command, "delete2", 7))
+        {
+            int line;
+            get_argument(command, 1, 'd', &line, 0);
+            
+            reserveTheState(line, 'd');
+
+            if(delete(line) == -1){
+                cancel_recovery();
+            }
+        }
         else if (!strncmp(command, "delete", 6))
         {
             int line;
@@ -236,11 +262,11 @@ int main(int argc, char *argv[])
         }
         else if (!strncmp(command, "undo", 4))
         {
-            // undo();
+            undo();
         }
         else if (!strncmp(command, "redo", 4))
         {
-            // redo();
+            redo();
         }
         else if (!strncmp(command, "save", 4))
         {

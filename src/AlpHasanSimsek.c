@@ -7,8 +7,10 @@ struct stateNode* undoTop = NULL;
 struct stateNode* redoTop = NULL;
 
 void reserveTheState(int operation_line, char operation_type){
-    char *statement = textbuffer[operation_line].statement;        
-    updateUndoStack(operation_type, statement, operation_line, free_head, inuse_head); 
+    char *statement = textbuffer[operation_line].statement;
+    updateUndoStack(operation_type, statement, operation_line, free_head, inuse_head);
+
+    DEBUG_PRINT("reserveTheState:: line: %d, type: %c\n", operation_line, operation_type);
 }
 
 void updateUndoStack(char op, char statement[], int line_num, int old_free_head, int old_inuse_head) {
@@ -106,8 +108,8 @@ void undo(void) {
         stateNode redoNode = {'d', free_head, inuse_head, "", tmp.line_num, NULL};
         //strcpy(redoNode.recoveryStatement, tmp.recoveryStatement); no need for the statment when redoing a delete operation
         pushRedo(redoNode);
-        free_head = tmp.prev_free_head;
-        inuse_head = tmp.prev_inuse_head;
+        // free_head = tmp.prev_free_head;
+        // inuse_head = tmp.prev_inuse_head;
         DEBUG_PRINT("inuse_head: '%d', free_head: '%d' now.\n", inuse_head, free_head);
         insert(tmp.line_num, tmp.recoveryStatement);
     } else {
@@ -115,8 +117,8 @@ void undo(void) {
         stateNode redoNode = {'i', free_head, inuse_head, "", tmp.line_num, NULL};
         strcpy(redoNode.recoveryStatement, tmp.recoveryStatement);
         pushRedo(redoNode);
-        free_head = tmp.prev_free_head;
-        inuse_head = tmp.prev_inuse_head;
+        // free_head = tmp.prev_free_head;
+        // inuse_head = tmp.prev_inuse_head;
         DEBUG_PRINT("inuse_head: '%d', free_head: '%d' now.\n", inuse_head, free_head);
         delete(tmp.line_num);
     }
@@ -135,8 +137,8 @@ void redo(void) {
         stateNode undoNode = {'d', free_head, inuse_head, "", tmp.line_num, NULL};
         strcpy(undoNode.recoveryStatement, tmp.recoveryStatement);
         pushUndo(undoNode);
-        free_head = tmp.prev_free_head;
-        inuse_head = tmp.prev_inuse_head;
+        // free_head = tmp.prev_free_head;
+        // inuse_head = tmp.prev_inuse_head;
         DEBUG_PRINT("inuse_head: '%d', free_head: '%d' now.\n", inuse_head, free_head);
         delete(tmp.line_num);
     } else {
@@ -144,9 +146,14 @@ void redo(void) {
         stateNode undoNode = {'i', free_head, inuse_head, "", tmp.line_num, NULL};
         //strcpy(undoNode.recoveryStatement, tmp.recoveryStatement); no need for a statement when undoing an insert operation
         pushUndo(undoNode);
-        free_head = tmp.prev_free_head;
-        inuse_head = tmp.prev_inuse_head;
+        // free_head = tmp.prev_free_head;
+        // inuse_head = tmp.prev_inuse_head;
         DEBUG_PRINT("inuse_head: '%d', free_head: '%d' now.\n", inuse_head, free_head);
         insert(tmp.line_num, tmp.recoveryStatement);
     }
+}
+
+void cancel_recovery( void ) {
+    DEBUG_PRINT("cancel_recovery\n");
+    popUndo();
 }
