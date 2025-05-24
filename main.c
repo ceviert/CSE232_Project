@@ -209,7 +209,11 @@ int main(int argc, char *argv[])
     while (1)
     {
         printf("$> ");
-        fgets(command, sizeof(command), stdin);
+        if (fgets(command, sizeof(command), stdin) == NULL) {
+            printf("Unknown Command\n");
+            continue;
+        }
+        
         printf("command: %s\n", command);
 
         if (!strncmp(command, "edit", 4))
