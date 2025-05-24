@@ -23,6 +23,9 @@ int free_head = NULL_LINE_TERMINATOR;
 // Head of the in-use list (lines that are currently in the editor)
 int inuse_head = NULL_LINE_TERMINATOR;
 
+// the line that the last undoable/redoable operation was performed on the buffer specially
+int buffer_index;
+
 // Stores the name of the file being edited
 char file_name[MAX_FILE_NAME_LENGTH];
 
@@ -155,7 +158,7 @@ int main(int argc, char *argv[])
                 getStringNcurses(statement, TEXT_BUFFER_STATEMENT_LENGTH);
 
                 if(insert(cursorY, statement) != -1){
-                    reserveTheState(cursorY, 'i');
+                    reserveTheState(buffer_index, 'i');
                 }
 
                 break;
@@ -164,7 +167,7 @@ int main(int argc, char *argv[])
             case 'D': {
 
                 if(delete(cursorY) != -1){
-                    reserveTheState(cursorY, 'd');
+                    reserveTheState(buffer_index, 'd');
                 }
 
                 break;
@@ -221,10 +224,11 @@ int main(int argc, char *argv[])
             get_argument(command, 1, 'd', &line, 0);
             get_argument(command, 2, 's', statement, TEXT_BUFFER_STATEMENT_LENGTH);
             statement[strcspn(statement, "\n")] = '\0';
-            printf("text inserted: (line: %d, statement: %s)\n", line, statement);
+            
 
             if(insert(line, statement) != -1){
-                reserveTheState(line, 'i');
+                printf("text inserted: (line: %d, statement: %s, buffer index: %d)\n", line, statement, buffer_index);
+                reserveTheState(buffer_index, 'i');
             }
         }
         else if (!strncmp(command, "insert", 6))
@@ -243,7 +247,8 @@ int main(int argc, char *argv[])
             get_argument(command, 1, 'd', &line, 0);
 
             if(delete(line) != -1){
-                reserveTheState(line, 'd');
+                printf("text deleted: (line: %d, statement: %s, buffer index: %d)\n", line, textbuffer[buffer_index].statement, buffer_index);
+                reserveTheState(buffer_index, 'd');
             }
         }
         else if (!strncmp(command, "delete", 6))

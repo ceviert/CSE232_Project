@@ -39,6 +39,7 @@ int insert(int line, char* stat) {
             textbuffer[inuse_head].prev = new_node; // Set our `new_node` as the first line in `text_buffer[]` 
         }
         inuse_head = new_node; // Make our `new_node` the head of the list
+        buffer_index = new_node;
         return 0; // Insertion is complete so terminate early
     }
 
@@ -54,7 +55,6 @@ int insert(int line, char* stat) {
 
     int next_node = textbuffer[current].next; // Get the next node after the previous one (currently `current`)
 
-
     // Now we insert the `new_node` in between `current` and `next_node`
     textbuffer[current].next = new_node;
     textbuffer[new_node].prev = current;
@@ -64,6 +64,7 @@ int insert(int line, char* stat) {
     if (next_node != NULL_LINE_TERMINATOR) {
         textbuffer[next_node].prev = new_node;
     }
-
+    
+    buffer_index = new_node;
     return 0;
 }

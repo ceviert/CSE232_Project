@@ -6,7 +6,7 @@
 struct stateNode* undoTop = NULL;
 struct stateNode* redoTop = NULL;
 
-void reserveTheState(int operation_line, char operation_type);
+void reserveTheState(int buffer_index, char operation_type);
 void updateUndoStack(char op, char statement[], int line_num);
 void pushUndo(struct stateNode theNode);
 stateNode popUndo();
@@ -18,7 +18,6 @@ void redo(void);
 void cancel_recovery( void );
 
 void updateUndoStack(char op, char statement[], int line_num) {
-    
     stateNode newnode;
     newnode.operation = op;
     newnode.line_num = line_num;
@@ -27,20 +26,19 @@ void updateUndoStack(char op, char statement[], int line_num) {
     clearRedo();
 }
 
-void reserveTheState(int operation_line, char operation_type){
-    //int indis = NULL_LINE_TERMINATOR;
-    //int counter = operation_line-1;
-    //for (indis = inuse_head; (indis != NULL_LINE_TERMINATOR && (counter != 0)); indis = textbuffer[indis].next, counter--);
-
-    if(operation_line < free_head-1){
-        operation_line = textbuffer[operation_line].next;
+void reserveTheState(int buffer_index, char operation_type){
+    int tmp = 0;
+    int op_line = 0;
+    while(tmp != buffer_index && tmp < TEXT_BUFFER_DEPTH){
+        tmp = textbuffer[tmp].next;
+        op_line++;
     }
 
-    char *statement = textbuffer[operation_line].statement;
+    char *statement = textbuffer[buffer_index].statement;
 
-    updateUndoStack(operation_type, statement, operation_line);
+    updateUndoStack(operation_type, statement, op_line);
 
-    DEBUG_PRINT("reserveTheState:: line: %d, type: %c, saved statement: %s\n", operation_line, operation_type, statement);
+    DEBUG_PRINT("reserveTheState:: line: %d, type: %c, saved statement: %s\n", op_line, operation_type, statement);
 }
 
 void pushUndo(struct stateNode theNode) {
