@@ -7,14 +7,16 @@
 /**
  * Inserts a new statement to the `textbuffer[]` array.
  * 
+ * @return 
+ * 
  * @param line The position of the line the new statement will be inserted to
  * @param stat The statement to be inserted
  */
-void insert(int line, char* stat) {
+int insert(int line, char* stat) {
     // Check if there are any free nodes
     if (free_head == NULL_LINE_TERMINATOR) {
         perror("ERR: Text buffer is full.\n"); // Display an error message
-        return; // Terminate the insertion
+        return -1; // Terminate the insertion
     }
 
     int new_node = free_head; // Allocate a new node
@@ -39,7 +41,8 @@ void insert(int line, char* stat) {
             textbuffer[inuse_head].prev = new_node; // Set our `new_node` as the first line in `text_buffer[]` 
         }
         inuse_head = new_node; // Make our `new_node` the head of the list
-        return; // Insertion is complete so terminate early
+        buffer_index = new_node; // Save the last undoable/redoable operation made in `buffer_index`
+        return 0; // Insertion is complete so terminate early
     }
 
     /** 
@@ -64,5 +67,6 @@ void insert(int line, char* stat) {
     if (next_node != NULL_LINE_TERMINATOR) {
         textbuffer[next_node].prev = new_node;
     }
-
+    buffer_index = new_node;// Save the last undoable/redoable operation made in `buffer_index`
+    return 0;
 }
