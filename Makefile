@@ -6,7 +6,7 @@ TARGET_EXT  :=
 TARGET      := bin/$(TARGET_NAME)$(TARGET_EXT)
 
 LIBRARY_NAME := libed2.a
-LIBRARY      := bin/$(LIBRARY_NAME)
+LIBRARY      := obj/$(LIBRARY_NAME)
 
 MAINFILE	:= main
 
@@ -38,7 +38,7 @@ OBJ_FILES   := $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC_FILES))
 
 all: directories $(TARGET)
 
-$(TARGET): $(OBJ_FILES) $(LIBRARY)
+$(TARGET): $(LIBRARY)
 	$(CC) $(CFLAGS) -c $(MAINFILE).c -o $(MAINFILE).o
 	$(CC) $(MAINFILE).o $^ -o $@ $(LDFLAGS)
 
