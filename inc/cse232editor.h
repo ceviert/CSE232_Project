@@ -41,7 +41,6 @@ extern struct node textbuffer[TEXT_BUFFER_DEPTH]; // max. 25 lines of text
 
 extern int free_head; // head node that points to the first free line in textbuffer[]  
 extern int inuse_head; // head node that points to the first used line in textbuffer[] 
-extern int buffer_index; // the line that the last undoable/redoable operation was performed on the buffer specially
 
 extern char file_name [MAX_FILE_NAME_LENGTH];
 

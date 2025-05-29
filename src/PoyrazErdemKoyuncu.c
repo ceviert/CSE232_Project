@@ -67,6 +67,5 @@ int delete(int line){
     previous -1 then labeling it as free_head therefore making it the new free_head
     */
 
-    buffer_index = current_head;
-    return 0;
+    return current_head;
 }   
