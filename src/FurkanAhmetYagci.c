@@ -5,7 +5,7 @@
 // display(): textbuffer[]'daki kullanılmakta olan satırları ekrana yazdırır, silinmiş satırları göstermez.
 void display(void) {
     int line = inuse_head; // inuse_head'den başla
-    int row = 0; // Ekranda yazmaya 4. satırdan başla (main.c'deki cursorY_MINLIMIT ile uyumlu)
+    int row = 0;
     
     // Kullanımdaki tüm satırları sırayla ekrana yazdır
     while (line != NULL_LINE_TERMINATOR) {

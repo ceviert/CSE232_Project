@@ -27,15 +27,14 @@ struct node
 };
 
 // Required things for redo and undo
-typedef struct stateNode {
+typedef struct stateNode { // Used to save the previous state of the textbuffer before an operation is performed
     char operation; // 'i' for insertion or 'd' for deletion operation
-    char recoveryStatement[TEXT_BUFFER_STATEMENT_LENGTH];
-    int line_num;
+    char recoveryStatement[TEXT_BUFFER_STATEMENT_LENGTH]; // the statement to be recovered
+    int line_num; // the line where the operation was performed by the user
     struct stateNode* next;
 } stateNode;
 
-void cancel_recovery( void );
-void reserveTheState(int buffer_index, char operation_type);
+void reserveTheState(int buffer_index, char operation_type, int cursorY); // reserves the state of the textbuffer before an operation
 //--------------------------------------------------------------------------
 
 extern struct node textbuffer[TEXT_BUFFER_DEPTH]; // max. 25 lines of text

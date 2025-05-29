@@ -23,7 +23,7 @@ int free_head = NULL_LINE_TERMINATOR;
 // Head of the in-use list (lines that are currently in the editor)
 int inuse_head = NULL_LINE_TERMINATOR;
 
-// the line that the last undoable/redoable operation was performed on the buffer specially
+// the node that the last undoable/redoable operation was performed on (The buffer specially)
 int buffer_index;
 
 // Stores the name of the file being edited
@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
                 getStringNcurses(statement, TEXT_BUFFER_STATEMENT_LENGTH);
 
                 if(insert(cursorY, statement) != -1){
-                    reserveTheState(buffer_index, 'i');
+                    reserveTheState(buffer_index, 'i', cursorY);
                 }
 
                 break;
@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
             case 'D': {
 
                 if(delete(cursorY) != -1){
-                    reserveTheState(buffer_index, 'd');
+                    reserveTheState(buffer_index, 'd', cursorY);
                 }
 
                 break;
