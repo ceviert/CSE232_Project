@@ -26,9 +26,6 @@ int free_head = NULL_LINE_TERMINATOR;
 // Head of the in-use list (lines that are currently in the editor)
 int inuse_head = NULL_LINE_TERMINATOR;
 
-// the line that the last undoable/redoable operation was performed on the buffer specially
-int buffer_index;
-
 // Stores the name of the file being edited
 char file_name[MAX_FILE_NAME_LENGTH];
 
@@ -143,6 +140,7 @@ int main(int argc, char *argv[])
     displayMethod(); // Display initial screen
 
     int ch;
+    int buffer_index;
     while ((ch = getch()) != 'Q') // Quit when user presses 'Q'
     {
         switch (ch)
@@ -161,8 +159,9 @@ int main(int argc, char *argv[])
                 char statement[TEXT_BUFFER_STATEMENT_LENGTH];
                 getStringNcurses(statement, TEXT_BUFFER_STATEMENT_LENGTH);
 
-                if(insert(cursorY, statement) != -1){
-                    reserveTheState(buffer_index, 'i');
+                buffer_index = insert(cursorY, statement);
+                if(buffer_index != -1){
+                    reserveTheState(buffer_index, 'i', cursorY);
                 }
 
                 displayMethod(); // Re-display buffer
@@ -172,8 +171,9 @@ int main(int argc, char *argv[])
 
             case 'D': {
 
-                if(delete(cursorY) != -1){
-                    reserveTheState(buffer_index, 'd');
+                buffer_index = delete(cursorY);
+                if(buffer_index != -1){
+                    reserveTheState(buffer_index, 'd', cursorY);
                 }
 
                 break;
@@ -236,7 +236,8 @@ int main(int argc, char *argv[])
             statement[strcspn(statement, "\n")] = '\0';
             
 
-            if(insert(line, statement) != -1){
+            buffer_index = insert(line, statement);
+            if(buffer_index != -1){
                 printf("text inserted: (line: %d, statement: %s, buffer index: %d)\n", line, statement, buffer_index);
                 reserveTheState(buffer_index, 'i');
             }
@@ -256,7 +257,8 @@ int main(int argc, char *argv[])
             int line;
             get_argument(command, 1, 'd', &line, 0);
 
-            if(delete(line) != -1){
+            buffer_index = delete(cursorY);
+            if(buffer_index != -1){
                 printf("text deleted: (line: %d, statement: %s, buffer index: %d)\n", line, textbuffer[buffer_index].statement, buffer_index);
                 reserveTheState(buffer_index, 'd');
             }
