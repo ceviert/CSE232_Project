@@ -140,7 +140,6 @@ int main(int argc, char *argv[])
     displayMethod(); // Display initial screen
 
     int ch;
-    int buffer_index;
     while ((ch = getch()) != 'Q') // Quit when user presses 'Q'
     {
         switch (ch)
@@ -159,10 +158,12 @@ int main(int argc, char *argv[])
                 char statement[TEXT_BUFFER_STATEMENT_LENGTH];
                 getStringNcurses(statement, TEXT_BUFFER_STATEMENT_LENGTH);
 
-                buffer_index = insert(cursorY, statement);
+                int buffer_index = insert(cursorY, statement);
                 if(buffer_index != -1){
                     reserveTheState(buffer_index, 'i', cursorY);
                 }
+
+                if (cursorY < cursorY_MAXLIMIT - 1) cursorY++;
 
                 displayMethod(); // Re-display buffer
 
@@ -171,7 +172,7 @@ int main(int argc, char *argv[])
 
             case 'D': {
 
-                buffer_index = delete(cursorY);
+                int buffer_index = delete(cursorY);
                 if(buffer_index != -1){
                     reserveTheState(buffer_index, 'd', cursorY);
                 }
@@ -236,10 +237,10 @@ int main(int argc, char *argv[])
             statement[strcspn(statement, "\n")] = '\0';
             
 
-            buffer_index = insert(line, statement);
+            int buffer_index = insert(line, statement);
             if(buffer_index != -1){
                 printf("text inserted: (line: %d, statement: %s, buffer index: %d)\n", line, statement, buffer_index);
-                reserveTheState(buffer_index, 'i');
+                reserveTheState(buffer_index, 'i', line);
             }
         }
         else if (!strncmp(command, "insert", 6))
@@ -257,10 +258,10 @@ int main(int argc, char *argv[])
             int line;
             get_argument(command, 1, 'd', &line, 0);
 
-            buffer_index = delete(cursorY);
+            int buffer_index = delete(cursorY);
             if(buffer_index != -1){
                 printf("text deleted: (line: %d, statement: %s, buffer index: %d)\n", line, textbuffer[buffer_index].statement, buffer_index);
-                reserveTheState(buffer_index, 'd');
+                reserveTheState(buffer_index, 'd', line);
             }
         }
         else if (!strncmp(command, "delete", 6))
