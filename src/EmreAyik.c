@@ -6,16 +6,16 @@ void edit(char *filename) {
     FILE *file = fopen(filename, "r");
 
     
-    for (int i = 0; i < MAX_LINES; i++) {
+    for (int i = 0; i < TEXT_BUFFER_DEPTH; i++) {
         textbuffer[i].prev = i - 1;
         textbuffer[i].next = i + 1;
         textbuffer[i].statement[0] = '\0';
     }
-    textbuffer[0].prev = -1;
-    textbuffer[MAX_LINES - 1].next = -1;
+    textbuffer[0].prev = NULL_LINE_TERMINATOR;
+    textbuffer[TEXT_BUFFER_DEPTH - 1].next = NULL_LINE_TERMINATOR;
 
     free_head = 0;
-    inuse_head = -1;
+    inuse_head = NULL_LINE_TERMINATOR;
 
     if (file == NULL) {
         printf("File not found. A new file will be created: %s\n", filename);
@@ -23,11 +23,11 @@ void edit(char *filename) {
     }
 
     char line[100];
-    int last_index = -1;
+    int last_index = NULL_LINE_TERMINATOR;
     int current_index = free_head;
 
     while (fgets(line, sizeof(line), file)) {
-        if (current_index == -1) {
+        if (current_index == NULL_LINE_TERMINATOR) {
             printf("Text buffer is full, no more lines can be loaded.\n");
             break;
         }
@@ -38,18 +38,19 @@ void edit(char *filename) {
         strncpy(textbuffer[current_index].statement, line, 39);
         textbuffer[current_index].statement[39] = '\0';
 
-       
-        textbuffer[current_index].prev = last_index;
-        textbuffer[current_index].next = -1;
+        int temp = textbuffer[current_index].next;
 
-        if (last_index != -1) {
+        textbuffer[current_index].prev = last_index;
+        textbuffer[current_index].next = NULL_LINE_TERMINATOR;
+
+        if (last_index != NULL_LINE_TERMINATOR) {
             textbuffer[last_index].next = current_index;
         } else {
             inuse_head = current_index;  
         }
 
         last_index = current_index;
-        current_index = textbuffer[current_index].next;
+        current_index = temp;
     }
 
     

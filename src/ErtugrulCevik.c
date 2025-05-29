@@ -57,7 +57,6 @@ int insert(int line, char* stat) {
 
     int next_node = textbuffer[current].next; // Get the next node after the previous one (currently `current`)
 
-
     // Now we insert the `new_node` in between `current` and `next_node`
     textbuffer[current].next = new_node;
     textbuffer[new_node].prev = current;

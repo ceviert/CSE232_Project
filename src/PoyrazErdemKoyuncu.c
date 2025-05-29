@@ -26,10 +26,10 @@ free_head: index of the first available free node.
  * @param line the line to be deleted
 
  */
-void delete(int line){
+int delete(int line){
     if (inuse_head == NULL_LINE_TERMINATOR){ // to check if the file is empty
         perror("ERROR: Nothing to delete");
-        return;
+        return -1;
     }
     
     int current_head = inuse_head;
@@ -42,7 +42,7 @@ void delete(int line){
 
     if (current_head == NULL_LINE_TERMINATOR){ // if the given line number is out of reach 
         perror("ERROR: Out of range");
-        return;
+        return -1;
     }
 
     int prev = textbuffer[current_head].prev;
@@ -70,4 +70,7 @@ void delete(int line){
     the code from 62-64 explains that the deleted node will be new free_head by making its next the current free_head and
     previous -1 then labeling it as free_head therefore making it the new free_head
     */
+
+    buffer_index = current_head;
+    return 0;
 }   

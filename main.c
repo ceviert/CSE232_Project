@@ -23,6 +23,9 @@ int free_head = NULL_LINE_TERMINATOR;
 // Head of the in-use list (lines that are currently in the editor)
 int inuse_head = NULL_LINE_TERMINATOR;
 
+// the line that the last undoable/redoable operation was performed on the buffer specially
+int buffer_index;
+
 // Stores the name of the file being edited
 char file_name[MAX_FILE_NAME_LENGTH];
 
@@ -154,10 +157,8 @@ int main(int argc, char *argv[])
                 char statement[TEXT_BUFFER_STATEMENT_LENGTH];
                 getStringNcurses(statement, TEXT_BUFFER_STATEMENT_LENGTH);
 
-                reserveTheState(cursorY, 'i');
-
-                if(!insert(cursorY, statement)){
-                    popUndo();
+                if(insert(cursorY, statement) != -1){
+                    reserveTheState(buffer_index, 'i');
                 }
 
                 break;
@@ -165,10 +166,8 @@ int main(int argc, char *argv[])
 
             case 'D': {
 
-                reserveTheState(cursorY, 'd');
-
-                if(!delete(cursorY)){
-                    popUndo();
+                if(delete(cursorY) != -1){
+                    reserveTheState(buffer_index, 'd');
                 }
 
                 break;
@@ -210,7 +209,11 @@ int main(int argc, char *argv[])
     while (1)
     {
         printf("$> ");
-        fgets(command, sizeof(command), stdin);
+        if (fgets(command, sizeof(command), stdin) == NULL) {
+            printf("Unknown Command\n");
+            continue;
+        }
+        
         printf("command: %s\n", command);
 
         if (!strncmp(command, "edit", 4))
@@ -218,7 +221,21 @@ int main(int argc, char *argv[])
             get_argument(command, 1, 's', file_name, MAX_FILE_NAME_LENGTH);
             edit(file_name);
         }
-        else if (!strncmp(command, "insert", 5))
+        else if (!strncmp(command, "insert2", 7))
+        {
+            int line;
+            char statement[TEXT_BUFFER_STATEMENT_LENGTH];
+            get_argument(command, 1, 'd', &line, 0);
+            get_argument(command, 2, 's', statement, TEXT_BUFFER_STATEMENT_LENGTH);
+            statement[strcspn(statement, "\n")] = '\0';
+            
+
+            if(insert(line, statement) != -1){
+                printf("text inserted: (line: %d, statement: %s, buffer index: %d)\n", line, statement, buffer_index);
+                reserveTheState(buffer_index, 'i');
+            }
+        }
+        else if (!strncmp(command, "insert", 6))
         {
             int line;
             char statement[TEXT_BUFFER_STATEMENT_LENGTH];
@@ -228,6 +245,16 @@ int main(int argc, char *argv[])
             printf("text inserted: (line: %d, statement: %s)\n", line, statement);
             insert(line, statement);
         }
+        else if (!strncmp(command, "delete2", 7))
+        {
+            int line;
+            get_argument(command, 1, 'd', &line, 0);
+
+            if(delete(line) != -1){
+                printf("text deleted: (line: %d, statement: %s, buffer index: %d)\n", line, textbuffer[buffer_index].statement, buffer_index);
+                reserveTheState(buffer_index, 'd');
+            }
+        }
         else if (!strncmp(command, "delete", 6))
         {
             int line;
@@ -236,11 +263,11 @@ int main(int argc, char *argv[])
         }
         else if (!strncmp(command, "undo", 4))
         {
-            // undo();
+            undo();
         }
         else if (!strncmp(command, "redo", 4))
         {
-            // redo();
+            redo();
         }
         else if (!strncmp(command, "save", 4))
         {
