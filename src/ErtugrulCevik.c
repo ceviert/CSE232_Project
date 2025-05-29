@@ -7,6 +7,8 @@
 /**
  * Inserts a new statement to the `textbuffer[]` array.
  * 
+ * @return 
+ * 
  * @param line The position of the line the new statement will be inserted to
  * @param stat The statement to be inserted
  */
@@ -39,6 +41,7 @@ int insert(int line, char* stat) {
             textbuffer[inuse_head].prev = new_node; // Set our `new_node` as the first line in `text_buffer[]` 
         }
         inuse_head = new_node; // Make our `new_node` the head of the list
+        
         return new_node; // Insertion is complete so terminate early
     }
 
@@ -63,6 +66,6 @@ int insert(int line, char* stat) {
     if (next_node != NULL_LINE_TERMINATOR) {
         textbuffer[next_node].prev = new_node;
     }
-    
+
     return new_node;
 }

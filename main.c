@@ -7,7 +7,10 @@
 #include <curses.h> // For ncurses-based TUI
 
 #include "cse232editor.h" // Contains declarations and macros used in the project
-#include "debug_interface.h" // Contains declarations and macros used in the project
+
+#ifdef DEBUG
+    #include "debug_interface.h" // Contains declarations and macros used in the project
+#endif
 
 // ----------------------------------------------------------------------------
 // GLOBAL VARIABLES
@@ -49,7 +52,8 @@ int getStringNcurses(char *tostr, int maxChar)
 
     getyx(stdscr, y, x); // Get cursor position
 
-    while ((ch = getch()) != '\n' && index < maxChar - 1)
+    // while ((ch = getch()) != '\n' && index < maxChar - 1)
+    while ((ch = getch()) != 'P' && index < maxChar - 1)
     {
         if (ch == KEY_BACKSPACE || ch == 127)
         {
@@ -159,6 +163,8 @@ int main(int argc, char *argv[])
                 if(buffer_index != -1){
                     reserveTheState(buffer_index, 'i', cursorY);
                 }
+
+                displayMethod(); // Re-display buffer
 
                 break;
             }

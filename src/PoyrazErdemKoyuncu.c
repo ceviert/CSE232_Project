@@ -61,6 +61,10 @@ int delete(int line){
     // no need for a else case since if the selected node's next is already the end of the list the next after deletion will still be -1
     textbuffer[current_head].next = free_head;
     textbuffer[current_head].prev = NULL_LINE_TERMINATOR;
+    
+    if (free_head != NULL_LINE_TERMINATOR) {
+        textbuffer[free_head].prev = current_head;
+    }
     free_head = current_head;
     /*
     the code from 62-64 explains that the deleted node will be new free_head by making its next the current free_head and

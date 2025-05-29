@@ -1,7 +1,7 @@
 # ABOUT
 - This repository is created for the CSE232 Spring 2025 Term Project.
 - Please add your info below!
-- This repository has 3 collaborators:
+- This repository has 6 collaborators:
   | ID | Username | Real Name |
   |----------|----------|----------|
   | 20230702055 | ceviert  | Ertuğrul ÇEVİK |
