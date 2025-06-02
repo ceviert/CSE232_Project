@@ -15,7 +15,7 @@
 int insert(int line, char* stat) {
     // Check if there are any free nodes
     if (free_head == NULL_LINE_TERMINATOR) {
-        perror("ERR: Text buffer is full.\n"); // Display an error message
+        // perror("ERR: Text buffer is full.\n"); // Display an error message
         return -1; // Terminate the insertion
     }
 

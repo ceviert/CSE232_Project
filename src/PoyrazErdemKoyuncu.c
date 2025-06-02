@@ -28,7 +28,7 @@ free_head: index of the first available free node.
  */
 int delete(int line){
     if (inuse_head == NULL_LINE_TERMINATOR){ // to check if the file is empty
-        perror("ERROR: Nothing to delete");
+        // perror("ERROR: Nothing to delete");
         return -1;
     }
     
@@ -41,7 +41,7 @@ int delete(int line){
     }
 
     if (current_head == NULL_LINE_TERMINATOR){ // if the given line number is out of reach 
-        perror("ERROR: Out of range");
+        // perror("ERROR: Out of range");
         return -1;
     }
 
